@@ -18,7 +18,18 @@ def main():
 
     st_c: int = nginx_c.count_documents({"method": "GET", "path": "/status"})
     print(f"{st_c} status check")
+    print("IPs:")
+    top_ips = nginx_c.aggregate(
+        [
+            {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10},
+        ]
+    )
 
+    for ip in top_ips:
+        print(f"\t{ip.get('_id')}: {ip.get('count')}")
+        
 
 if __name__ == "__main__":
     main()
