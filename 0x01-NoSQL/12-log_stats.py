@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
-"""Provides some stats about Nginx logs stored in MongoDB"""
+""" provides some stats about Nginx logs stored in MongoDB """
 from pymongo import MongoClient
 
-def nginx_stats():
-    """Connects to MongoDB and retrieves Nginx log statistics."""
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client.logs
-    collection = db.nginx
 
-    # Total number of logs
-    total_logs = collection.count_documents({})
-    print(f"{total_logs} logs")
+def main():
+    """provides some stats about Nginx logs stored in MongoDB"""
+    client = MongoClient("mongodb://127.0.0.1:27017")
+    nginx_c = client.logs.nginx
 
-    # Methods stats
+    n_logs = nginx_c.count_documents({})
+    print(f"{n_logs} logs")
+    methods: list[str] = ["GET", "POST", "PUT", "PATCH", "DELETE"]
     print("Methods:")
-    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    for method in methods:
-        count = collection.count_documents({"method": method})
-        print(f"\tmethod {method}: {count}")
+    for m in methods:
+        c: int = nginx_c.count_documents({"method": m})
+        print(f"\tmethod {m}: {c}")
 
-    # GET method and path=/status
-    status_count = collection.count_documents({"method": "GET", "path": "/status"})
-    print(f"{status_count} status check")
+    st_c: int = nginx_c.count_documents({"method": "GET", "path": "/status"})
+    print(f"{st_c} status check")
 
-if __name__ == "main":
-    nginx_stats()
+
+if __name__ == "__main__":
+    main()
